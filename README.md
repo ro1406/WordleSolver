@@ -12,4 +12,5 @@ https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b
 https://gist.github.com/cfreshman/40608e78e83eb4e1d60b285eb7e9732f
 
     Updates:
-PlayWordle.py: Avoids repeated letters in a location already guessed before. Forces relocation of yellow letters.
+    PlayWordle.py: Further reduce score (-10) if word contains banned word instead of -1
+    PlayWordle.py: Avoids repeated letters in a location already guessed before. Forces relocation of yellow letters.
