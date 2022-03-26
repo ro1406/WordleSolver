@@ -1,5 +1,3 @@
-from termcolor import colored
-
 myfile=open("wordle-answers-alphabetical.txt",'r')
 myfile2=open("wordle-allowed-guesses.txt",'r')
 wordlist=myfile.readlines()+myfile2.readlines()
@@ -13,11 +11,11 @@ def getManhattanScore(word,info,banned):
     for x in range(len(word)):
         if info[x][0]==word[x] and info[x][1]==2:#If matching and green
             c+=2
-        elif info[x][0] in word and info[x][1]==1 and info[x][0] not in banned[word.index(info[x][0])]:
+        if info[x][0] in word and info[x][1]==1 and info[x][0] not in banned[word.index(info[x][0])]:
             #If exists, yellow and isnt already guessed in that location before
             c+=1            
-        elif word[x] in banned[x]: #If its a banned letter, then reduce the score (We've tried it before and it was gray)
-            c-=1
+        if word[x] in banned[x]: #If its a banned letter, then reduce the score (We've tried it before and it was gray)
+            c-=10
         #ELSE match but not green, or exists but not yellow, or doesnt exist
         #Then dont do anything (c+=0)
     return [c,banned]
@@ -27,14 +25,22 @@ def getGuess(infoGained,allGuesses,banned):
     global wordlist
     if infoGained[0][0]==-1 and infoGained[0][1]==-1:
         #First guess, just guess CRANE cause i like it
-        return ['crane',banned]
+        return ['earth',banned]
+
     #Otherwise, make use of the info found and lets find similar words:
-
-
     for x in range(len(banned)):
-        if infoGained[x][1]==0:#if a letter is gray, ban it from everywhere
-            for i in range(len(banned)):
-                banned[i].append(infoGained[x][0])
+        if infoGained[x][1]==0:#if a letter is gray and doesnt appear anywhere else in another color,then ban it from everywhere
+            #Check if this letter appears anywhere else with another color:
+            done=False
+            for i in range(len(infoGained)):
+                if infoGained[i][0]==infoGained[x][0] and infoGained[i][1]!=0:
+                    #It appears in another color, so ban it only from this location
+                    banned[x].append(infoGained[x][0])
+                    done=True
+                    break
+            if not done:
+                for i in range(len(banned)):
+                    banned[i].append(infoGained[x][0])
         elif infoGained[x][1]==1: #If the letter is yellow, only ban it from the current location
             banned[x].append(infoGained[x][0])
     
@@ -52,7 +58,6 @@ def getGuess(infoGained,allGuesses,banned):
 
 # ------------------------------------------------ GAME HERE -------------------------------------------
 numguesses=0
-guess="aaaaa"
 allGuesses=[]
 banned=[[],[],[],[],[]] #Store all letters that are banned in a given location
 infoGained=[[-1,-1],[-1,-1],[-1,-1],[-1,-1],[-1,-1]] #0,1,2 -> Gray,Yellow,Green
@@ -77,6 +82,4 @@ while numguesses<6 and not found:
     for x in range(len(infoGained)):
         if infoGained[x][1]!=2:
             found=False
-
     numguesses+=1
-    
